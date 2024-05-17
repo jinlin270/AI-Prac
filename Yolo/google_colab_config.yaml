@@ -1,0 +1,8 @@
+path: '/Users/linjin/Downloads/Yolo/Data' # dataset root dir
+train: Training  # train images (relative to 'path')
+val: Test  # val images (relative to 'path')
+
+names:
+  0: text 
+
+
