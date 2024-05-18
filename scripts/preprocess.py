@@ -91,9 +91,10 @@ def preprocess_image(image):
 
 
 # if the image being processed is pixelated
-computer_image = False
+computer_image = True
 
-file_path = "/Users/linjin/Downloads/test_img.jpg"
+# file_path = "/Users/linjin/Downloads/test_img.jpg"
+file_path = "/Users/linjin/Desktop/wee.jpg"
 
 if computer_image:
     colored_img_array = cv2.imread(file_path)
