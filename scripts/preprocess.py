@@ -4,6 +4,7 @@ import os
 
 
 def preprocess_image(image):
+    # Correct nonuniform illumination of the background
     se = cv2.getStructuringElement(cv2.MORPH_RECT, (8, 8))
     bg = cv2.morphologyEx(image, cv2.MORPH_DILATE, se)
     corrected_image = cv2.divide(image, bg, scale=255)
@@ -15,30 +16,27 @@ def preprocess_image(image):
     # Binarization
     _, binary_image = cv2.threshold(contrast_enhanced_image, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
-    # Noise removal
+    # Noise removal using median blur
     denoised_image = cv2.medianBlur(binary_image, 5)
 
-    return denoised_image
+    # Further noise removal using morphological operations
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    
+    # Apply morphological opening (erosion followed by dilation)
+    opened_image = cv2.morphologyEx(denoised_image, cv2.MORPH_OPEN, kernel)
+    
+    # Apply morphological closing (dilation followed by erosion)
+    final_image = cv2.morphologyEx(opened_image, cv2.MORPH_CLOSE, kernel)
 
-    # Skew correction
-    # coords = np.column_stack(np.where(denoised_image > 0))
-    # angle = cv2.minAreaRect(coords)[-1]
-    # if angle < -45:
-    #     angle = -(90 + angle)
-    # else:
-    #     angle = -angle
-    # (h, w) = image.shape[:2]
-    # center = (w // 2, h // 2)
-    # rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
-    # rotated_image = cv2.warpAffine(
-    #     denoised_image,
-    #     rotation_matrix,
-    #     (w, h),
-    #     flags=cv2.INTER_CUBIC,
-    #     borderMode=cv2.BORDER_REPLICATE,
-    # )
+    return final_image
 
-    return denoised_image
+# Example usage
+# image = cv2.imread('path_to_your_image', cv2.IMREAD_GRAYSCALE)
+# processed_image = preprocess_image(image)
+# cv2.imshow('Processed Image', processed_image)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+
 
 
 IMG_DIR = "/Users/linjin/Downloads/test_img.jpg"
