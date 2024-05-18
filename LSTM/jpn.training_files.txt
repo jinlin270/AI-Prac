@@ -1,0 +1,10 @@
+train/0.lstmf
+train/1.lstmf
+train/2.lstmf
+train/3.lstmf
+train/4.lstmf
+train/5.lstmf
+train/6.lstmf
+train/7.lstmf
+train/8.lstmf
+train/9.lstmf
