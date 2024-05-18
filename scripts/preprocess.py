@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 import os
 
+import cv2
+import numpy as np
 
 def preprocess_image(image):
     # Correct nonuniform illumination of the background
@@ -28,7 +30,49 @@ def preprocess_image(image):
     # Apply morphological closing (dilation followed by erosion)
     final_image = cv2.morphologyEx(opened_image, cv2.MORPH_CLOSE, kernel)
 
+    # Identify and remove small noise regions
+    contours, _ = cv2.findContours(final_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    min_area = 100  # Adjust this threshold based on your image size and noise characteristics
+    
+    for contour in contours:
+        area = cv2.contourArea(contour)
+        if area < min_area:
+            cv2.drawContours(final_image, [contour], 0, (0, 0, 0), -1)  # Fill contour with black
+    
+    # Strengthen non-noise segments by slightly widening them
+    final_image = cv2.dilate(final_image, kernel, iterations=1)
+    
     return final_image
+
+
+
+
+# def preprocess_image(image):
+#     # Correct nonuniform illumination of the background
+#     se = cv2.getStructuringElement(cv2.MORPH_RECT, (8, 8))
+#     bg = cv2.morphologyEx(image, cv2.MORPH_DILATE, se)
+#     corrected_image = cv2.divide(image, bg, scale=255)
+
+#     # Enhance contrast using CLAHE (Contrast Limited Adaptive Histogram Equalization)
+#     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+#     contrast_enhanced_image = clahe.apply(corrected_image)
+
+#     # Binarization
+#     _, binary_image = cv2.threshold(contrast_enhanced_image, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+
+#     # Noise removal using median blur
+#     denoised_image = cv2.medianBlur(binary_image, 5)
+
+#     # Further noise removal using morphological operations
+#     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    
+#     # Apply morphological opening (erosion followed by dilation)
+#     opened_image = cv2.morphologyEx(denoised_image, cv2.MORPH_OPEN, kernel)
+    
+#     # Apply morphological closing (dilation followed by erosion)
+#     final_image = cv2.morphologyEx(opened_image, cv2.MORPH_CLOSE, kernel)
+
+#     return final_image
 
 # Example usage
 # image = cv2.imread('path_to_your_image', cv2.IMREAD_GRAYSCALE)
